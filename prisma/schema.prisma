@@ -178,10 +178,8 @@ model EmailConfiguration {
 
 model ReceiptSettings {
   id                 String   @id @default("singleton")
-  presidentName      String?
-  presidentSignature String?  @db.Text
-  treasurerName      String?
-  treasurerSignature String?  @db.Text
+  ceoName            String?
+  ceoSignature       String?  @db.Text
   updatedAt          DateTime @updatedAt
   @@map("receipt_settings")
 }

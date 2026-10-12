@@ -12,7 +12,7 @@ A single-system payment portal. Students visit the root URL (`/`) to choose purc
 - `/api/payments/status` — payment-status polling; `/api/receipts/download?ref=…` — PDF receipt for a confirmed payment
 - `/api/products` — public list of items currently on sale (read by the checkout page)
 - `/api/admin/products` — Super Admin-only: add, rename, re-price, hide/show and delete items (`/api/admin/products/[id]`)
-- `/api/admin/receipt-settings` — Super Admin-only President/Treasurer names and signature images printed on PDF receipts
+- `/api/admin/receipt-settings` — Super Admin-only CEO name and signature image printed on PDF receipts
 - `/api/admin/sms-settings` — Super Admin-only SMS provider, API key, sender ID and message template
 - `/api/admin/email-settings` — Super Admin-only email provider (Brevo), API key, sender name/address, subject and message
 - `/api/admin/notifications` — failed SMS/email sends for the admin Delivery log; `POST /api/admin/notifications/[id]/resolve` marks one fixed

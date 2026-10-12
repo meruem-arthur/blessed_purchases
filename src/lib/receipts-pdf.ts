@@ -21,8 +21,7 @@ export type ReceiptPdfData = {
   verifyUrl?: string | null;
   // Set by the Super Admin (Admin > Receipts & QR). Shown only if configured.
   signatories?: {
-    president?: { name?: string | null; signatureUrl?: string | null } | null;
-    treasurer?: { name?: string | null; signatureUrl?: string | null } | null;
+    ceo?: { name?: string | null; signatureUrl?: string | null } | null;
   };
 };
 
@@ -136,8 +135,7 @@ export async function generateReceiptPdf(data: ReceiptPdfData): Promise<Uint8Arr
   const rowsHeight = laid.reduce((h, r) => h + r.lines.length * 12 + 10, 0);
   const sig = data.signatories;
   const signers = [
-    { role: "President", name: sig?.president?.name?.trim() || "", image: await embedDataUrlImage(pdfDoc, sig?.president?.signatureUrl) },
-    { role: "Treasurer", name: sig?.treasurer?.name?.trim() || "", image: await embedDataUrlImage(pdfDoc, sig?.treasurer?.signatureUrl) },
+    { role: "CEO", name: sig?.ceo?.name?.trim() || "", image: await embedDataUrlImage(pdfDoc, sig?.ceo?.signatureUrl) },
   ];
   const showSignatories = signers.some((s) => s.name || s.image);
   const pageHeight = Math.max(MIN_HEIGHT, 470 + rowsHeight + (showSignatories ? 135 : 0) + (data.verifyUrl ? QR_BLOCK_HEIGHT : 0));
@@ -212,13 +210,13 @@ export async function generateReceiptPdf(data: ReceiptPdfData): Promise<Uint8Arr
   page.drawRectangle({ x: (PAGE_WIDTH - stampW) / 2, y: y - 6, width: stampW, height: stampH, borderColor: GREEN, borderWidth: 1.5, color: rgb(1, 1, 1) });
   centered(page, "PAID", y + 3, 15, bold, GREEN);
 
-  // Signatories (President left, Treasurer right)
+  // Signatory (the CEO, centred)
   if (showSignatories) {
     y -= 40;
     const colW = (PAGE_WIDTH - 2 * MARGIN) / 2, imgMaxH = 38, imgMaxW = colW - 30, lineY = y - imgMaxH;
-    signers.forEach((sg, i) => {
+    signers.forEach((sg) => {
       if (!sg.name && !sg.image) return;
-      const colX = MARGIN + i * colW, cx = colX + colW / 2;
+      const colX = (PAGE_WIDTH - colW) / 2, cx = PAGE_WIDTH / 2;
       if (sg.image) {
         const sc = Math.min(imgMaxW / sg.image.width, imgMaxH / sg.image.height, 1);
         page.drawImage(sg.image, { x: cx - (sg.image.width * sc) / 2, y: lineY + 2, width: sg.image.width * sc, height: sg.image.height * sc });

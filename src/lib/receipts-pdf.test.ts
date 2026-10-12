@@ -23,12 +23,12 @@ describe("receipt pdf signatories", () => {
   // 1x1 transparent PNG
   const png = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
   const payment = { internalReference: "PAY-3", currency: "GHS", amount: 300, provider: "PAYSTACK", paidAt: null, items: [{ label: "Compass only", amount: 300 }] };
-  it("renders with a President and Treasurer", async () => {
-    const bytes = await generateReceiptPdf({ ...base, payment, signatories: { president: { name: "Ama Boateng", signatureUrl: png }, treasurer: { name: "Kofi Asante", signatureUrl: png } } });
+  it("renders with a CEO signatory", async () => {
+    const bytes = await generateReceiptPdf({ ...base, payment, signatories: { ceo: { name: "Ama Boateng", signatureUrl: png } } });
     expect(Buffer.from(bytes).subarray(0, 4).toString()).toBe("%PDF");
   });
   it("ignores a corrupt signature instead of failing", async () => {
-    const bytes = await generateReceiptPdf({ ...base, payment, signatories: { president: { name: "Ama Boateng", signatureUrl: "data:image/png;base64,AAAA" }, treasurer: null } });
+    const bytes = await generateReceiptPdf({ ...base, payment, signatories: { ceo: { name: "Ama Boateng", signatureUrl: "data:image/png;base64,AAAA" } } });
     expect(bytes.length).toBeGreaterThan(500);
   });
 });

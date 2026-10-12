@@ -71,7 +71,7 @@ export async function buildReceiptPdf(internalReference: string) {
     issuedAt: payment.receipt.issuedAt,
     student: { fullName: payment.student.fullName, referenceNumber: payment.student.referenceNumber, department: payment.student.department },
     payment: { internalReference: payment.internalReference, currency: payment.currency, amount: Number(payment.amount), provider: payment.provider, paidAt: payment.paidAt, items },
-    signatories: rs ? { president: { name: rs.presidentName, signatureUrl: rs.presidentSignature }, treasurer: { name: rs.treasurerName, signatureUrl: rs.treasurerSignature } } : undefined,
+    signatories: rs ? { ceo: { name: rs.ceoName, signatureUrl: rs.ceoSignature } } : undefined,
   });
   return { pdfBytes, receiptNumber: payment.receipt.receiptNumber };
 }
