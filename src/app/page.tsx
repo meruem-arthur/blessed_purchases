@@ -54,7 +54,7 @@ export default function Home() {
           <div>
             <h2 className="mb-3 text-sm font-semibold text-portal-text sm:text-lg">Your details</h2>
             <div className="grid gap-3 sm:grid-cols-2">
-              {([["Full name", fullName, setFullName], ["Reference number", referenceNumber, setReferenceNumber], ["Department", department, setDepartment], ["Phone number", phone, setPhone], ["Email (optional)", email, setEmail]] as [string, string, (v: string) => void][]).map(([label, value, setter]) => (
+              {([["Full name", fullName, setFullName], ["Reference number", referenceNumber, setReferenceNumber], ["Department", department, setDepartment], ["Phone number", phone, setPhone], ["Email", email, setEmail]] as [string, string, (v: string) => void][]).map(([label, value, setter]) => (
                 <label key={label} className={field}>{label}<input className="portal-input mt-1" type={label.startsWith("Email") ? "email" : "text"} inputMode={label.startsWith("Email") ? "email" : label === "Phone number" ? "tel" : undefined} autoComplete={label.startsWith("Email") ? "email" : undefined} maxLength={label === "Department" ? 100 : undefined} value={value} onChange={e => setter(e.target.value)} /></label>
               ))}
             </div>
