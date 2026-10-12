@@ -17,7 +17,7 @@ type Payment = {
   status: string;
   createdAt: string;
   paidAt: string | null;
-  student: { fullName: string; referenceNumber: string; phone: string; email: string | null };
+  student: { fullName: string; referenceNumber: string; department: string | null; phone: string; email: string | null };
   failureReason?: string | null;
   receipt: { receiptNumber: string } | null;
   lastSms: { status: "PENDING" | "SENT" | "FAILED"; createdAt: string; errorMessage: string | null } | null;
@@ -165,22 +165,23 @@ export default function AdminDashboard() {
           <section className="portal-card-glass p-4">
             <label className="block text-sm text-portal-muted" htmlFor="payment-search">Find a student</label>
             <div className="mt-1 flex gap-2">
-              <input id="payment-search" type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, reference number or receipt number" className="portal-input flex-1" autoComplete="off" />
+              <input id="payment-search" type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, reference number, department or receipt number" className="portal-input flex-1" autoComplete="off" />
               {search && <button type="button" onClick={() => setSearch("")} className="portal-btn-ghost">Clear</button>}
             </div>
             {search.trim() && data && <p className="mt-2 text-xs text-portal-muted">{data.payments?.length ?? 0} payment{data.payments?.length === 1 ? "" : "s"} found for “{search.trim()}”</p>}
           </section>
 
           <section className="portal-card-glass overflow-x-auto">
-            <table className="w-full min-w-[1100px] text-left text-sm text-portal-text">
+            <table className="w-full min-w-[1200px] text-left text-sm text-portal-text">
               <thead className="border-b border-black/10 text-portal-muted">
-                <tr>{["Student", "Reference", "Phone", "Items", "Amount", "Status", "Date", "Receipt", "SMS & email"].map((h) => <th key={h} className="p-3 font-semibold">{h}</th>)}</tr>
+                <tr>{["Student", "Reference", "Department", "Phone", "Items", "Amount", "Status", "Date", "Receipt", "SMS & email"].map((h) => <th key={h} className="p-3 font-semibold">{h}</th>)}</tr>
               </thead>
               <tbody>
                 {(data?.payments || []).map((p: Payment) => (
                   <tr key={p.id} className="border-b border-black/5">
                     <td className="p-3">{p.student.fullName}<div className="text-xs text-portal-muted">{p.student.email}</div></td>
                     <td className="p-3">{p.student.referenceNumber}</td>
+                    <td className="p-3">{p.student.department || "—"}</td>
                     <td className="p-3">{p.student.phone}</td>
                     <td className="p-3">{Array.isArray((p as any).items) ? (p as any).items.map((i: any) => i.label).join(", ") : "—"}</td>
                     <td className="p-3">{p.currency} {Number(p.amount).toFixed(2)}</td>

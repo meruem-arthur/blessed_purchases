@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 
 vi.mock("@/lib/db", () => ({ prisma: { paymentProviderConfiguration: { findUnique: vi.fn() }, product: { findMany: vi.fn() } } }));
@@ -7,17 +7,23 @@ import { prisma } from "@/lib/db";
 import { POST } from "./route";
 
 const post = (body: unknown) => POST(new NextRequest("http://localhost/api/payments/initiate", { method: "POST", body: JSON.stringify(body) }));
-const valid = { fullName: "Kwame Mensah", referenceNumber: "UMaT/2026/001", phone: "0244000000", email: "kwame@example.com", items: ["p1"] };
+const valid = { fullName: "Kwame Mensah", referenceNumber: "UMaT/2026/001", department: "Mining Engineering", phone: "0244000000", email: "kwame@example.com", items: ["p1"] };
 const product = { id: "p1", label: "Geo Tools", amount: 650 };
 
 describe("POST /api/payments/initiate - required fields", () => {
-  it("requires an email address", async () => {
-    for (const email of ["", "   ", undefined]) {
-      const res = await post({ ...valid, email });
+  beforeEach(() => vi.clearAllMocks());
+  it("requires a department", async () => {
+    for (const department of ["", "   ", undefined]) {
+      const res = await post({ ...valid, department });
       expect(res.status).toBe(400);
-      expect((await res.json()).error).toMatch(/email/i);
+      expect((await res.json()).error).toMatch(/department/i);
     }
     expect(prisma.paymentProviderConfiguration.findUnique).not.toHaveBeenCalled();
+  });
+  it("does not require an email address", async () => {
+    vi.mocked(prisma.product.findMany).mockResolvedValue([product] as any);
+    vi.mocked(prisma.paymentProviderConfiguration.findUnique).mockResolvedValue(null as any);
+    for (const email of ["", "   ", undefined]) expect((await post({ ...valid, email })).status).toBe(503); // got past validation
   });
   it("rejects a malformed email", async () => {
     expect((await post({ ...valid, email: "not-an-email" })).status).toBe(400);

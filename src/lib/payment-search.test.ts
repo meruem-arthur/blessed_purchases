@@ -6,12 +6,13 @@ describe("paymentSearchWhere", () => {
     expect(paymentSearchWhere(undefined)).toBeUndefined();
     expect(paymentSearchWhere("   ")).toBeUndefined();
   });
-  it("matches name, reference number and receipt number, case-insensitively", () => {
+  it("matches name, reference number, department and receipt number, case-insensitively", () => {
     const where: any = paymentSearchWhere("20/1234");
     expect(where.AND).toHaveLength(1);
     expect(where.AND[0].OR).toEqual([
       { student: { fullName: { contains: "20/1234", mode: "insensitive" } } },
       { student: { referenceNumber: { contains: "20/1234", mode: "insensitive" } } },
+      { student: { department: { contains: "20/1234", mode: "insensitive" } } },
       { receipt: { receiptNumber: { contains: "20/1234", mode: "insensitive" } } },
     ]);
   });

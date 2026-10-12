@@ -8,11 +8,11 @@ export default function Home() {
   useEffect(() => {
     fetch("/api/products", { cache: "no-store" }).then(r => r.json()).then(d => { if (d.error) throw new Error(d.error); setProducts(d.products); }).catch(() => { setLoadError("Could not load the items. Please refresh the page."); setProducts([]); });
   }, []);
-  const [items, setItems] = useState<string[]>([]); const [fullName, setFullName] = useState(""); const [referenceNumber, setReferenceNumber] = useState(""); const [phone, setPhone] = useState(""); const [email, setEmail] = useState(""); const [busy, setBusy] = useState(false); const [error, setError] = useState("");
+  const [items, setItems] = useState<string[]>([]); const [fullName, setFullName] = useState(""); const [referenceNumber, setReferenceNumber] = useState(""); const [department, setDepartment] = useState(""); const [phone, setPhone] = useState(""); const [email, setEmail] = useState(""); const [busy, setBusy] = useState(false); const [error, setError] = useState("");
   const total = (products ?? []).filter(p => items.includes(p.id)).reduce((sum, p) => sum + p.amount, 0);
   async function pay() {
     setBusy(true); setError("");
-    try { const res = await fetch("/api/payments/initiate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fullName, referenceNumber, phone, email, items }) }); const data = await res.json(); if (!res.ok) throw new Error(data.error || "Unable to start payment"); window.location.assign(data.authorizationUrl); }
+    try { const res = await fetch("/api/payments/initiate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fullName, referenceNumber, department, phone, email, items }) }); const data = await res.json(); if (!res.ok) throw new Error(data.error || "Unable to start payment"); window.location.assign(data.authorizationUrl); }
     catch (e) { setError(e instanceof Error ? e.message : "Unable to start payment"); setBusy(false); }
   }
   const field = "text-left text-sm text-portal-muted";
@@ -52,8 +52,8 @@ export default function Home() {
           <div>
             <h2 className="mb-3 text-sm font-semibold text-portal-text sm:text-lg">Your details</h2>
             <div className="grid gap-3 sm:grid-cols-2">
-              {([["Full name", fullName, setFullName], ["Reference number", referenceNumber, setReferenceNumber], ["Phone number", phone, setPhone], ["Email", email, setEmail]] as [string, string, (v: string) => void][]).map(([label, value, setter]) => (
-                <label key={label} className={field}>{label}<input className="portal-input mt-1" type={label === "Email" ? "email" : "text"} inputMode={label === "Email" ? "email" : label === "Phone number" ? "tel" : undefined} autoComplete={label === "Email" ? "email" : undefined} value={value} onChange={e => setter(e.target.value)} /></label>
+              {([["Full name", fullName, setFullName], ["Reference number", referenceNumber, setReferenceNumber], ["Department", department, setDepartment], ["Phone number", phone, setPhone], ["Email (optional)", email, setEmail]] as [string, string, (v: string) => void][]).map(([label, value, setter]) => (
+                <label key={label} className={field}>{label}<input className="portal-input mt-1" type={label.startsWith("Email") ? "email" : "text"} inputMode={label.startsWith("Email") ? "email" : label === "Phone number" ? "tel" : undefined} autoComplete={label.startsWith("Email") ? "email" : undefined} maxLength={label === "Department" ? 100 : undefined} value={value} onChange={e => setter(e.target.value)} /></label>
               ))}
             </div>
           </div>
@@ -65,7 +65,7 @@ export default function Home() {
               <p className="text-xs text-portal-muted">Total to pay</p>
               <p className="text-xl font-bold text-portal-accent sm:text-3xl">GHS {total.toLocaleString()}</p>
             </div>
-            <button className="portal-btn-primary w-full sm:w-auto" disabled={busy || !items.length || !fullName.trim() || !referenceNumber.trim() || !phone.trim() || !/^\S+@\S+\.\S+$/.test(email.trim())} onClick={pay}>
+            <button className="portal-btn-primary w-full sm:w-auto" disabled={busy || !items.length || !fullName.trim() || !referenceNumber.trim() || !department.trim() || !phone.trim() || (email.trim() !== "" && !/^\S+@\S+\.\S+$/.test(email.trim()))} onClick={pay}>
               {busy ? "Connecting to payment…" : "Proceed to payment"}
             </button>
           </div>

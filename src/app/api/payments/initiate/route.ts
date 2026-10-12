@@ -8,9 +8,9 @@ import { PENDING_PAYMENT_STALE_AFTER_MS } from "@/lib/payments/constants";
 const clean = (v: unknown) => typeof v === "string" ? v.trim().replace(/\s+/g, " ") : "";
 export async function POST(req: NextRequest) {
   try {
-    const input = await req.json(); const fullName = clean(input.fullName); const referenceNumber = clean(input.referenceNumber); const phone = clean(input.phone); const email = clean(input.email); const items = Array.isArray(input.items) ? input.items : [];
-    if (!fullName || !referenceNumber || !phone) return NextResponse.json({ error: "Name, student/reference number and phone are required." }, { status: 400 });
-    if (!/^\S+@\S+\.\S+$/.test(email)) return NextResponse.json({ error: "A valid email address is required." }, { status: 400 });
+    const input = await req.json(); const fullName = clean(input.fullName); const referenceNumber = clean(input.referenceNumber); const department = clean(input.department).slice(0, 100); const phone = clean(input.phone); const email = clean(input.email); const items = Array.isArray(input.items) ? input.items : [];
+    if (!fullName || !referenceNumber || !department || !phone) return NextResponse.json({ error: "Name, student/reference number, department and phone are required." }, { status: 400 });
+    if (email && !/^\S+@\S+\.\S+$/.test(email)) return NextResponse.json({ error: "That email address does not look right. Fix it or leave it blank." }, { status: 400 });
     const unique = validateProductSelection(items);
     if (!unique) return NextResponse.json({ error: "Select at least one valid item." }, { status: 400 });
     // Prices always come from the database, never from the browser.
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     if (!rawConfig?.secretKey) return NextResponse.json({ error: "Online payment has not been configured. Please contact the administrator." }, { status: 503 });
     if (rawConfig.provider !== "PAYSTACK") return NextResponse.json({ error: "The selected payment provider is not enabled for checkout." }, { status: 503 });
     const config = decryptPaymentSecrets(rawConfig); const amount = calculateTotal(lineItems);
-    const student = await prisma.student.upsert({ where: { referenceNumber }, update: { fullName, phone, email: email || null }, create: { fullName, referenceNumber, phone, email: email || null } });
+    const student = await prisma.student.upsert({ where: { referenceNumber }, update: { fullName, department, phone, email: email || null }, create: { fullName, referenceNumber, department, phone, email: email || null } });
     const alreadyPaid = await prisma.payment.findFirst({ where: { studentId: student.id, status: "SUCCESS" } });
     if (alreadyPaid) return NextResponse.json({ error: "A successful payment already exists for this reference number. Contact the administrator if you need help." }, { status: 409 });
     const pending = await prisma.payment.findFirst({ where: { studentId: student.id, status: "PENDING", createdAt: { gt: new Date(Date.now() - PENDING_PAYMENT_STALE_AFTER_MS) } } });

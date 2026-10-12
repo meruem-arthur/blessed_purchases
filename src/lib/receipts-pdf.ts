@@ -8,7 +8,7 @@ import { QR_LOGO_BASE64 } from "@/lib/qr-logo";
 export type ReceiptPdfData = {
   receiptNumber: string;
   issuedAt: Date;
-  student: { fullName: string; referenceNumber: string };
+  student: { fullName: string; referenceNumber: string; department?: string | null };
   payment: {
     internalReference: string;
     currency: string;
@@ -174,6 +174,7 @@ export async function generateReceiptPdf(data: ReceiptPdfData): Promise<Uint8Arr
   if (data.payment.paidAt) { row(page, y, "Date Paid", fmtDate(data.payment.paidAt), font, bold); y -= 17; }
   row(page, y, "Student Name", data.student.fullName, font, bold); y -= 17;
   row(page, y, "Reference No.", data.student.referenceNumber, font, bold); y -= 17;
+  if (data.student.department?.trim()) { row(page, y, "Department", data.student.department.trim(), font, bold); y -= 17; }
   row(page, y, "Payment Method", data.payment.provider === "PAYSTACK" ? "Paystack (online)" : data.payment.provider, font, bold); y -= 17;
   row(page, y, "Payment Ref.", data.payment.internalReference, font, bold);
 

@@ -5,7 +5,7 @@ const MAX_WORDS = 8;
 
 /**
  * Turns what an admin typed in the search box into a database filter.
- * Every word must match the student's name, student reference number or the
+ * Every word must match the student's name, student reference number, department or the
  * receipt number (case-insensitive, partial matches allowed), so "kwame
  * mensah", "mensah kwa" and "20/1234" all find what you would expect.
  * Returns undefined for an empty search, which means "no filter".
@@ -18,6 +18,7 @@ export function paymentSearchWhere(raw: string | null | undefined): Prisma.Payme
       OR: [
         { student: { fullName: { contains: word, mode: "insensitive" as const } } },
         { student: { referenceNumber: { contains: word, mode: "insensitive" as const } } },
+        { student: { department: { contains: word, mode: "insensitive" as const } } },
         { receipt: { receiptNumber: { contains: word, mode: "insensitive" as const } } },
       ],
     })),

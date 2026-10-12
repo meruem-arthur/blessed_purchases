@@ -41,7 +41,7 @@ function Status() {
         </div>
         {done ? <>
           <h1 className="text-2xl font-bold text-portal-text">Payment confirmed</h1>
-          <p className="text-sm text-portal-muted">Thank you. Your receipt number is <strong>{info!.receiptNumber}</strong>. A copy is also being sent to your phone by SMS and to your email address.</p>
+          <p className="text-sm text-portal-muted">Thank you. Your receipt number is <strong>{info!.receiptNumber}</strong>. Download your receipt below and keep it safe.</p>
           <ReceiptActions downloadUrl={`/api/receipts/download?ref=${encodeURIComponent(ref!)}`} fileName={`${info!.receiptNumber}.pdf`} />
         </> : failed ? <>
           <h1 className="text-2xl font-bold text-portal-text">Payment not completed</h1>

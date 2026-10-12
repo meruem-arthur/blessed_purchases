@@ -92,6 +92,7 @@ model Student {
   id              String   @id @default(cuid())
   fullName        String
   referenceNumber String   @unique
+  department      String?
   phone           String
   email           String?
   createdAt       DateTime @default(now())
