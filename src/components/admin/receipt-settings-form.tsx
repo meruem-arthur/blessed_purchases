@@ -118,7 +118,7 @@ export function ReceiptSettingsForm() {
     <div className="space-y-6">
       <section className="portal-card-glass max-w-2xl p-6">
         <h2 className="mb-1 text-xl font-semibold text-portal-text">Receipt signatory</h2>
-        <p className="mb-5 text-sm text-portal-muted">The CEO's name and signature printed on every PDF receipt. Upload the signature as a PNG or JPG - a clear signature on a white or transparent background works best.</p>
+        <p className="mb-5 text-sm text-portal-muted">The CEO&apos;s name and signature printed on every PDF receipt. Upload the signature as a PNG or JPG - a clear signature on a white or transparent background works best.</p>
         <form onSubmit={save} className="space-y-4">
           {panel()}
           {message && <p role="status" className={`text-sm ${ok ? "text-emerald-700" : "text-red-600"}`}>{message}</p>}
