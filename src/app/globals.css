@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body { background: #0d0a14; color: #f1eefb; }
+.admin-input { display:block; width:100%; border:1px solid rgba(255,255,255,.15); border-radius:.5rem; background:rgba(0,0,0,.2); padding:.75rem; color:white; }
+
+/* ---------------------------------------------------------- */
+/* STUDENT PORTAL THEME (light + teal) — same look as the      */
+/* original dues portal: blurred campus photo, white cards,    */
+/* teal accents. Admin pages keep the dark/purple theme above. */
+/* ---------------------------------------------------------- */
+.portal-shell { position: relative; background-color: #f4f7f8; color: #1a2332; min-height: 100vh; overflow: hidden; }
+.portal-shell::before {
+  content: ""; position: fixed; inset: -30px;
+  background-image: url("/campus-bg.jpg"); background-size: cover; background-position: center;
+  filter: blur(6px); opacity: 0.7; z-index: 0; pointer-events: none;
+}
+.portal-content { position: relative; z-index: 1; }
+.portal-card { background-color: #ffffff; border: 1px solid #e2e8ec; border-radius: 0.9rem; box-shadow: 0 8px 30px -12px rgba(15, 23, 32, 0.12); }
+.portal-btn-primary {
+  background-color: rgba(15, 155, 142, 0.78); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  color: #ffffff; font-weight: 600; border-radius: 0.6rem; padding: 0.7rem 1.3rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 4px 20px -6px rgba(15, 155, 142, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: background-color 0.15s ease;
+}
+.portal-btn-primary:hover { background-color: rgba(11, 122, 112, 0.85); }
+.portal-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.portal-btn-secondary {
+  background-color: rgba(255, 255, 255, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6); color: #1a2332; border-radius: 0.6rem; padding: 0.65rem 1.2rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.portal-btn-secondary:hover { background-color: rgba(255, 255, 255, 0.7); }
+.portal-input { background-color: #f8fafb; border: 1px solid #e2e8ec; border-radius: 0.6rem; padding: 0.6rem 0.85rem; color: #1a2332; width: 100%; }
+.portal-input:focus { outline: none; border-color: #0f9b8e; box-shadow: 0 0 0 3px rgba(15,155,142,0.12); }
+.portal-logos { display: flex; align-items: center; justify-content: center; gap: 1.1rem; margin: 0 auto; }
+.portal-crest { width: 5.5rem; height: 5.5rem; display: flex; align-items: center; justify-content: center; }
+.portal-crest img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35)); }
+.portal-heading-on-photo { color: #0b7a70; text-shadow: 0 2px 6px rgba(255,255,255,0.85), 0 1px 2px rgba(255,255,255,0.9); }
+.portal-text-on-photo { color: #1a2332; text-shadow: 0 1px 4px rgba(255, 255, 255, 0.9), 0 1px 2px rgba(255, 255, 255, 0.95); }
+
+/* Admin pages reuse the portal look: same campus photo, glass cards, glass buttons. */
+.portal-card-glass { background-color: rgba(255, 255, 255, 0.74); backdrop-filter: blur(16px) saturate(150%); -webkit-backdrop-filter: blur(16px) saturate(150%); border: 1px solid rgba(255, 255, 255, 0.7); border-radius: 0.9rem; box-shadow: 0 10px 34px -14px rgba(15, 23, 32, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.7); }
+.portal-btn-ghost { background-color: rgba(15, 155, 142, 0.1); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(15, 155, 142, 0.35); color: #0b7a70; font-weight: 600; border-radius: 0.6rem; padding: 0.55rem 1.1rem; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5); transition: background-color 0.15s ease; }
+.portal-btn-ghost:hover { background-color: rgba(15, 155, 142, 0.2); }
+.portal-btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; }
+.portal-btn-primary:active, .portal-btn-ghost:active { transform: scale(0.98); }

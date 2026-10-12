@@ -1,0 +1,8 @@
+import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
+import { z } from "zod";
+import { prisma } from "@/lib/db";
+import { requireSuperAdmin } from "@/lib/authorization";
+const schema = z.object({ name:z.string().trim().min(2).max(100), email:z.string().trim().email().max(254), password:z.string().min(12).max(128), role:z.enum(["ADMIN","SUPER_ADMIN"]).default("ADMIN") });
+export async function GET(){try{await requireSuperAdmin();const users=await prisma.user.findMany({select:{id:true,name:true,email:true,role:true,status:true,createdAt:true},orderBy:{createdAt:"desc"}});return NextResponse.json({users});}catch(e:any){return NextResponse.json({error:e?.status===401?"Sign in required":"Super Admin access required"},{status:e?.status||500});}}
+export async function POST(req:NextRequest){try{await requireSuperAdmin();const parsed=schema.safeParse(await req.json());if(!parsed.success)return NextResponse.json({error:"Enter a name, valid email, password of at least 12 characters and valid role."},{status:400});const email=parsed.data.email.toLowerCase();if(await prisma.user.findUnique({where:{email}}))return NextResponse.json({error:"An account with that email already exists."},{status:409});const user=await prisma.user.create({data:{name:parsed.data.name,email,passwordHash:await bcrypt.hash(parsed.data.password,12),role:parsed.data.role},select:{id:true,name:true,email:true,role:true,status:true,createdAt:true}});return NextResponse.json({user},{status:201});}catch(e:any){return NextResponse.json({error:e?.status===401?"Sign in required":e?.status===403?"Super Admin access required":"Unable to create administrator"},{status:e?.status||500});}}

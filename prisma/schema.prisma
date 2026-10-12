@@ -1,0 +1,235 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+}
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+}
+enum PaymentProviderType {
+  PAYSTACK
+}
+enum ProviderEnvironment {
+  TEST
+  LIVE
+}
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+enum SmsProviderType {
+  MOCK
+  ARKESEL
+  AFRICASTALKING
+}
+enum EmailProviderType {
+  MOCK
+  BREVO
+}
+enum NotificationChannel {
+  SMS
+  EMAIL
+}
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  username     String?       @unique
+  phone        String?
+  passwordHash String
+  role         Role          @default(ADMIN)
+  status       AccountStatus @default(ACTIVE)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  auditLogs    AuditLog[]
+  passwordResetTokens PasswordResetToken[]
+  @@map("users")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+model Product {
+  id        String   @id @default(cuid())
+  label     String
+  amount    Decimal  @db.Decimal(10, 2)
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([active, sortOrder])
+  @@map("products")
+}
+
+model Student {
+  id              String   @id @default(cuid())
+  fullName        String
+  referenceNumber String   @unique
+  phone           String
+  email           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  payments        Payment[]
+  receipts        Receipt[]
+  @@map("students")
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  studentId         String
+  student           Student       @relation(fields: [studentId], references: [id])
+  provider          PaymentProviderType
+  providerTxId      String?
+  internalReference String        @unique
+  amount            Decimal       @db.Decimal(10, 2)
+  currency          String        @default("GHS")
+  items             Json?
+  status            PaymentStatus @default(PENDING)
+  failureReason     String?
+  paidAt            DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  receipt           Receipt?
+  webhookEvents     WebhookEvent[]
+  @@index([status])
+  @@index([providerTxId])
+  @@index([createdAt])
+  @@map("payments")
+}
+
+model Receipt {
+  id            String   @id @default(cuid())
+  receiptNumber String   @unique
+  paymentId     String   @unique
+  payment       Payment  @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  studentId     String
+  student       Student  @relation(fields: [studentId], references: [id])
+  issuedAt      DateTime @default(now())
+  @@map("receipts")
+}
+
+model PaymentProviderConfiguration {
+  id            String              @id @default("singleton")
+  provider      PaymentProviderType @default(PAYSTACK)
+  environment   ProviderEnvironment @default(TEST)
+  publicKey     String?
+  secretKey     String?
+  webhookSecret String?
+  configValue   String?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  @@map("payment_provider_configurations")
+}
+
+model SmsConfiguration {
+  id              String          @id @default("singleton")
+  provider        SmsProviderType @default(MOCK)
+  senderId        String          @default("")
+  messageTemplate String          @default("Payment of GHS {amount} confirmed for {name} ({reference}).\nItems: {items}\nReceipt No: {receipt}")
+  apiKey          String?
+  username        String?
+  enabled         Boolean         @default(false)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  @@map("sms_configurations")
+}
+
+model EmailConfiguration {
+  id              String            @id @default("singleton")
+  provider        EmailProviderType @default(MOCK)
+  senderName      String            @default("Payments")
+  senderEmail     String            @default("")
+  subject         String            @default("Payment receipt {receipt}")
+  messageTemplate String            @default("Dear {name},\n\nYour payment of GHS {amount} for {items} has been received. Thank you.\n\nReference: {reference}\nReceipt number: {receipt}\n\nYour PDF receipt is attached to this email.")
+  apiKey          String?
+  enabled         Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  @@map("email_configurations")
+}
+
+model ReceiptSettings {
+  id                 String   @id @default("singleton")
+  presidentName      String?
+  presidentSignature String?  @db.Text
+  treasurerName      String?
+  treasurerSignature String?  @db.Text
+  updatedAt          DateTime @updatedAt
+  @@map("receipt_settings")
+}
+
+model SupportSettings {
+  id        String   @id @default("singleton")
+  email     String?
+  phone     String?
+  updatedAt DateTime @updatedAt
+  @@map("support_settings")
+}
+
+model WebhookEvent {
+  id              String   @id @default(cuid())
+  paymentId       String?
+  payment         Payment? @relation(fields: [paymentId], references: [id])
+  provider        PaymentProviderType
+  providerEventId String
+  rawPayload      Json
+  processed       Boolean  @default(false)
+  receivedAt      DateTime @default(now())
+  @@unique([provider, providerEventId])
+  @@map("webhook_events")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model NotificationLog {
+  id               String             @id @default(cuid())
+  channel          NotificationChannel
+  recipient        String
+  status           NotificationStatus @default(PENDING)
+  errorMessage     String?
+  relatedPaymentId String?
+  resolvedAt       DateTime?
+  resolvedBy       String?
+  createdAt        DateTime           @default(now())
+  @@index([status, createdAt])
+  @@map("notification_logs")
+}
