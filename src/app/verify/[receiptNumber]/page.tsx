@@ -19,6 +19,7 @@ export default async function VerifyReceipt({ params, searchParams }: { params: 
       <div className="portal-content portal-card w-full max-w-md space-y-3 p-8">
         <div className="portal-logos">
           <div className="portal-crest">{/* eslint-disable-next-line @next/next/no-img-element */}<img src="/school-crest.png" alt="University of Mines and Technology crest" /></div>
+          <div className="portal-crest">{/* eslint-disable-next-line @next/next/no-img-element */}<img src="/org-logo.png" alt="Organisation logo" /></div>
         </div>
         {valid && receipt ? (
           <>

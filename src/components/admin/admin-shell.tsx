@@ -15,6 +15,7 @@ export function AdminShell({ eyebrow, title, subtitle, actions, children }: { ey
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/school-crest.png" alt="University of Mines and Technology crest" />
               </div>
+          <div className="portal-crest !h-14 !w-14">{/* eslint-disable-next-line @next/next/no-img-element */}<img src="/org-logo.png" alt="Organisation logo" /></div>
             </div>
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-portal-accentDark">{eyebrow}</p>

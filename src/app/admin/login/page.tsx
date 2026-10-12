@@ -33,6 +33,7 @@ function LoginForm() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/school-crest.png" alt="University of Mines and Technology crest" />
             </div>
+          <div className="portal-crest">{/* eslint-disable-next-line @next/next/no-img-element */}<img src="/org-logo.png" alt="Organisation logo" /></div>
           </div>
           <h1 className="text-2xl font-bold text-portal-text">{BRANDING.organisation ? `${BRANDING.organisation} Payments` : "Payments"}</h1>
           <p className="portal-text-on-photo text-base font-medium">Administrator Sign In</p>

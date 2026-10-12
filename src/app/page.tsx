@@ -25,10 +25,12 @@ export default function Home() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/school-crest.png" alt="University of Mines and Technology crest" />
             </div>
+          <div className="portal-crest">{/* eslint-disable-next-line @next/next/no-img-element */}<img src="/org-logo.png" alt="Organisation logo" /></div>
           </div>
           <div>
             <p className="portal-heading-on-photo text-sm font-bold uppercase tracking-widest sm:text-base">University Of Mines And Technology</p>
             {BRANDING.organisation && <p className="mt-1 text-base font-semibold text-black sm:text-lg">{BRANDING.organisation}</p>}
+            {BRANDING.receiptSubtitle && <p className="text-xs font-medium text-black/70 sm:text-sm">{BRANDING.receiptSubtitle}</p>}
           </div>
         </div>
 

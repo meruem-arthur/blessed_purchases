@@ -126,7 +126,7 @@ export async function generateReceiptPdf(data: ReceiptPdfData): Promise<Uint8Arr
   const pdfDoc = await PDFDocument.create();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const crest = await loadLogo(pdfDoc, "school-crest.png");
+  const [crest, orgLogo] = await Promise.all([loadLogo(pdfDoc, "school-crest.png"), loadLogo(pdfDoc, "org-logo.png")]);
 
   // Lay the item rows out first so the page can be sized to fit them.
   const colSn = MARGIN + 8, colItem = MARGIN + 38, colPrice = PAGE_WIDTH - MARGIN - 8;
@@ -151,10 +151,11 @@ export async function generateReceiptPdf(data: ReceiptPdfData): Promise<Uint8Arr
 
   let y = pageHeight - 30;
   const logoBox = 44;
-  if (crest) {
-    const sc = Math.min(logoBox / crest.width, logoBox / crest.height);
-    page.drawImage(crest, { x: (PAGE_WIDTH - crest.width * sc) / 2, y: y - logoBox + 4, width: crest.width * sc, height: crest.height * sc });
-  }
+  // School crest and the organisation's logo, side by side in the middle.
+  const logos = [crest, orgLogo].filter((l): l is NonNullable<typeof crest> => !!l).map((img) => { const sc = Math.min(logoBox / img.width, logoBox / img.height); return { img, w: img.width * sc, h: img.height * sc }; });
+  const gap = 22; const rowWidth = logos.reduce((t, l) => t + l.w, 0) + gap * Math.max(0, logos.length - 1);
+  let lx = (PAGE_WIDTH - rowWidth) / 2;
+  for (const l of logos) { page.drawImage(l.img, { x: lx, y: y - logoBox + 4 + (logoBox - l.h) / 2, width: l.w, height: l.h }); lx += l.w + gap; }
   let ty = y - 58;
   if (BRANDING.organisation) {
     for (const ln of wrap(bold, BRANDING.organisation.toUpperCase(), 12.5, PAGE_WIDTH - 2 * MARGIN)) { centered(page, ln, ty, 12.5, bold, GREEN); ty -= 15; }
